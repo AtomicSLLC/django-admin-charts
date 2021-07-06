@@ -501,7 +501,7 @@ class DashboardStats(models.Model):
                     names.append(name)
                     values.append(key)
             configuration['select_box_dynamic_' + str(m2m.id)] = values
-        elif len(operations) > 1 and configuration['select_box_operation_field'] == '':
+        elif operations and len(operations) > 1 and configuration['select_box_operation_field'] == '':
             names = operations
         else:
             names = ['']
