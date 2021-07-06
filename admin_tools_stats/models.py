@@ -353,9 +353,11 @@ class DashboardStats(models.Model):
             errors['model_name'] = str(e)
 
         try:
-            for operation in self.get_operations_list():
-                if model and operation:
-                    self.get_operation_field(operation)
+            operations = self.get_operations_list()
+            if operations:
+                for operation in self.get_operations_list():
+                    if model and operation:
+                        self.get_operation_field(operation)
         except FieldError as e:
             errors['operation_field_name'] = str(e)
 
