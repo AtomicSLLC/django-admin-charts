@@ -44,6 +44,7 @@ class DashboardChart(modules.DashboardModule):
         global stat_dict  # We use this to came around current implementations of Dashboards which are query inefective
         self.dashboard_stats = stat_dict[self.graph_key]
         self.title = self.get_title(self.graph_key)
+        self.dashboard_stats.custom = kwargs.get('custom', None)
 
     def init_with_context(self, context):
         super(DashboardChart, self).init_with_context(context)
