@@ -494,7 +494,13 @@ class DashboardStats(models.Model):
                 for key, name in dy_map.items():
                     if isinstance(name, (list, tuple)):
                         name = name[1]
-                    selected_str = 'selected=selected' if key == i.default_option else ''
+                    if self.custom != None:
+                        if self.custom["select_box_dynamic_%i" % i.id] != None:
+                            selected_str = 'selected=selected' if key == i.default_option or key == self.custom["select_box_dynamic_%i" % i.id] else ''
+                        else:
+                            selected_str = 'selected=selected' if key == i.default_option else ''
+                    else:
+                        selected_str = 'selected=selected' if key == i.default_option else ''
                     temp += '<option value="%s" %s>%s</option>' % (key, selected_str, name)
                 temp += '</select>'
 
