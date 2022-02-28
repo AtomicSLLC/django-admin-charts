@@ -484,18 +484,18 @@ class DashboardStats(models.Model):
             dy_map = i.get_dynamic_choices()
             if dy_map:
                 temp += i.criteria.criteria_name + ': <select class="chart-input dynamic_criteria_select_box" name="select_box_dynamic_%i" >' % i.id
-                if self.custom != None:
-                    if  self.custom["select_box_dynamic_%i" % i.id] != None:
-                        temp += '<option value=%s>-------</option>' % self.custom["select_box_dynamic_%i" % i.id]
-                    else:
-                        temp += '<option value="">-------</option>'
-                else:
-                    temp += '<option value="">-------</option>'
+#                 if self.custom != None:
+#                     if  self.custom["select_box_dynamic_%i" % i.id] != None:
+#                         temp += '<option value=%s>-------</option>' % self.custom["select_box_dynamic_%i" % i.id]
+#                     else:
+#                         temp += '<option value="">-------</option>'
+#                 else:
+                temp += '<option value="">-------</option>'
                 for key, name in dy_map.items():
                     if isinstance(name, (list, tuple)):
                         name = name[1]
                     if self.custom != None:
-                        if self.custom["select_box_dynamic_%i" % i.id] != None:
+                        if self.custom.get("select_box_dynamic_%i" % i.id, None) != None:
                             selected_str = 'selected=selected' if key == i.default_option or key == self.custom["select_box_dynamic_%i" % i.id] else ''
                         else:
                             selected_str = 'selected=selected' if key == i.default_option else ''
