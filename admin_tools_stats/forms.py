@@ -5,14 +5,14 @@ from django.utils.timezone import now
 
 
 class ChartSettingsForm(forms.Form):
-    def __init__(self, stats, user=None, *args, **kwargs):
+    def __init__(self, stats, user=None, custom=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for ch_filter in stats.criteriatostatsm2m_set.filter(use_as="chart_filter").order_by(
             "order"
         ):
             dy_map = ch_filter.get_dynamic_choices(user=user)
             if dy_map:
-                if custom.get("select_box_dynamic_%i" % ch_filter.id, None) != None:
+                if custom != None and custom.get("select_box_dynamic_%i" % ch_filter.id, None) != None:
                     self.fields[f"select_box_dynamic_{ch_filter.id}"] = forms.ChoiceField(
                         choices=[("", "-------")] + list(dy_map.values()),
                         label=ch_filter.criteria.criteria_name,
