@@ -12,11 +12,18 @@ class ChartSettingsForm(forms.Form):
         ):
             dy_map = ch_filter.get_dynamic_choices(user=user)
             if dy_map:
-                self.fields[f"select_box_dynamic_{ch_filter.id}"] = forms.ChoiceField(
-                    choices=[("", "-------")] + list(dy_map.values()),
-                    label=ch_filter.criteria.criteria_name,
-                    initial=ch_filter.default_option,
-                )
+                if custom.get("select_box_dynamic_%i" % ch_filter.id, None) != None:
+                    self.fields[f"select_box_dynamic_{ch_filter.id}"] = forms.ChoiceField(
+                        choices=[("", "-------")] + list(dy_map.values()),
+                        label=ch_filter.criteria.criteria_name,
+                        initial=custom["select_box_dynamic_%i" % ch_filter.id],
+                    )
+                else:
+                    self.fields[f"select_box_dynamic_{ch_filter.id}"] = forms.ChoiceField(
+                        choices=[("", "-------")] + list(dy_map.values()),
+                        label=ch_filter.criteria.criteria_name,
+                        initial=ch_filter.default_option,
+                    )
                 self.fields[f"select_box_dynamic_{ch_filter.id}"].widget.attrs[
                     "class"
                 ] = "chart-input"
