@@ -1,15 +1,4 @@
-<div class="admin_charts">
+{% load admin_chart_tags %}
 {% for chart in charts %}
-<div id="chart_{{ chart.graph_key }}" class="chrt_container" style="{% if not request.GET.show == chart.graph_key and disabled %}display:none{% endif %}">
-<div class="chrt_flex">
-    <h3>{{ chart.graph_title }}</h3>
-    <form class="stateform" action="." method="POST" enctype="multipart/form-data">
-       {% csrf_token %}
-       {{ chart.get_control_form }}
-    </form>
-    <div id="chart_container_{{ chart.graph_key }}" class="chrt_svg_container"><svg></svg></div>
-    <br/>
-</div>
-</div>
+   {% include "./chart_container.html" with chart=chart %}
 {% endfor %}
-</div>

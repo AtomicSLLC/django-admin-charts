@@ -16,9 +16,15 @@ from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 from import_export.admin import ImportExportMixin
 from admin_tools_stats.app_label_renamer import AppLabelRenamer
-from admin_tools_stats.models import CriteriaToStatsM2M, DashboardStats, DashboardStatsCriteria
+from admin_tools_stats.models import (
+    CachedValue,
+    CriteriaToStatsM2M,
+    DashboardStats,
+    DashboardStatsCriteria,
+)
 
-AppLabelRenamer(native_app_label=u'admin_tools_stats', app_label=_('Admin Tools Stats')).main()
+
+AppLabelRenamer(native_app_label="admin_tools_stats", app_label=_("Admin Tools Stats")).main()
 
 
 @admin.register(DashboardStatsCriteria)
@@ -27,41 +33,42 @@ class DashboardStatsCriteriaAdmin(ImportExportMixin, admin.ModelAdmin):
     Allows the administrator to view and modify certain attributes
     of a DashboardStats.
     """
+
     list_display = (
-        'id',
-        'criteria_name',
-        'criteria_name',
-        'dynamic_criteria_field_name',
-        'criteria_dynamic_mapping_preview',
+        "id",
+        "criteria_name",
+        "criteria_name",
+        "dynamic_criteria_field_name",
+        "criteria_dynamic_mapping_preview",
     )
-    list_filter = ['created_date']
+    list_filter = ["created_date"]
     readonly_fields = (
-        'created_date',
-        'updated_date',
+        "created_date",
+        "updated_date",
     )
-    search_fields = ('criteria_name',)
-    ordering = ('id', )
+    search_fields = ("criteria_name",)
+    ordering = ("id",)
     save_as = True
 
 
 class DashboardStatsCriteriaInline(admin.TabularInline):
     model = CriteriaToStatsM2M
     readonly_fields = (
-        'criteria__dynamic_criteria_field_name',
-        'criteria__criteria_dynamic_mapping_preview',
+        "criteria__dynamic_criteria_field_name",
+        "criteria__criteria_dynamic_mapping_preview",
     )
     fields = (
-        'criteria',
-        'order',
-        'use_as',
-        'default_option',
-        'choices_based_on_time_range',
-        'count_limit',
-        'prefix',
-        'criteria__dynamic_criteria_field_name',
-        'criteria__criteria_dynamic_mapping_preview',
+        "criteria",
+        "order",
+        "use_as",
+        "default_option",
+        "choices_based_on_time_range",
+        "count_limit",
+        "prefix",
+        "criteria__dynamic_criteria_field_name",
+        "criteria__criteria_dynamic_mapping_preview",
     )
-    autocomplete_fields = ('criteria',)
+    autocomplete_fields = ("criteria",)
     extra = 0
 
     def criteria__dynamic_criteria_field_name(self, obj):
@@ -78,7 +85,7 @@ class DashboardStatsCriteriaInline(admin.TabularInline):
 class DashboardStatsForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['default_multiseries_criteria'].queryset = CriteriaToStatsM2M.objects.filter(
+        self.fields["default_multiseries_criteria"].queryset = CriteriaToStatsM2M.objects.filter(
             stats=self.instance,
         )
 
@@ -92,18 +99,86 @@ class DashboardStatsAdmin(ImportExportMixin, admin.ModelAdmin):
     Allows the administrator to view and modify certain attributes
     of a DashboardStats.
     """
-    list_display = ('id', 'graph_key', 'analytics_link', 'graph_title', 'model_name', 'distinct', 'type_operation_field_name',
-                    'is_visible', 'created_date', 'date_field_name', 'operation_field_name', 'default_chart_type')
-    list_filter = ['created_date']
-    exclude = ('criteria',)
+
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "graph_key",
+                    "graph_title",
+                    ("model_app_name", "model_name", "date_field_name"),
+                    ("operation_field_name", "distinct"),
+                    ("user_field_name", "show_to_users"),
+                    ("allowed_type_operation_field_name", "type_operation_field_name"),
+                    ("allowed_chart_types", "default_chart_type"),
+                    (
+                        "allowed_time_scales",
+                        "default_time_scale",
+                        "default_time_period",
+                    ),
+                    "y_axis_format",
+                    "default_multiseries_criteria",
+                    "is_visible",
+                    "cache_values",
+                ),
+            },
+        ),
+    )
+    list_display = (
+        "id",
+        "graph_key",
+        "analytics_link",
+        "graph_title",
+        "model_name",
+        "distinct",
+        "type_operation_field_name",
+        "is_visible",
+        "show_to_users",
+        "cache_values",
+        "created_date",
+        "date_field_name",
+        "operation_field_name",
+        "default_chart_type",
+    )
+    list_filter = [
+        "created_date",
+        "is_visible",
+        "show_to_users",
+    ]
+    exclude = ("criteria",)
     inlines = [DashboardStatsCriteriaInline]
-    ordering = ('id', )
     save_as = True
     form = DashboardStatsForm
 
     def analytics_link(self, obj):
         return format_html(
             "<a href='{url}?show={key}' target='_blank'>A</a>",
-            url=reverse('chart-analytics'),
+            url=reverse("chart-analytics"),
             key=obj.graph_key,
         )
+
+
+@admin.register(CachedValue)
+class CachedValueAdmin(admin.ModelAdmin):
+    list_display = (
+        "stats",
+        "date",
+        "value",
+        "operation",
+        "operation_field_name",
+        "filtered_value",
+        "time_scale",
+        "multiple_series_choice",
+        "is_final",
+    )
+    list_filter = (
+        "stats",
+        "operation",
+        "operation_field_name",
+        "filtered_value",
+        "time_scale",
+        "is_final",
+        "multiple_series_choice",
+        "stats__cache_values",
+    )

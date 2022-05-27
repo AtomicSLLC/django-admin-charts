@@ -43,6 +43,7 @@ Requirements
 * ``Python>3.6``
 * PostgreSQL (MySQL is experimental, other databases probably not working but PRs are welcome)
 * ``simplejson`` for charts based on ``DecimalField`` values
+* The current PyPI version of `django-cache-utils` `is not compatible with Django 4.0 <https://github.com/PetrDlouhy/django-admin-charts/issues/39>`_. To install compatible version you can install working version by running ``pip install git+https://github.com/PetrDlouhy/django-cache-utils@django40``.
 
 ============
 Installation
@@ -65,13 +66,6 @@ Add ``admin_tools_stats`` (the Django admin charts application) & ``django_nvd3`
         ...
         'django.contrib.admin',
     )
-    
-Install the ``nvd3==1.7.1`` and ``d3==3.3.13`` javascript libraries. For installation with ``django-bower`` see section `Installation of javascript libraries with django-bower`_.
-Set library paths if they differ from the ``django-bower`` defaults::
-
-   ADMIN_CHARTS_NVD3_JS_PATH = 'bow/nvd3/build/nv.d3.js'
-   ADMIN_CHARTS_NVD3_CSS_PATH = 'bow/nvd3/build/nv.d3.css'
-   ADMIN_CHARTS_D3_JS_PATH = 'bow/d3/d3.js'
 
 Register chart views in your ``urls.py``::
 
@@ -80,11 +74,18 @@ Register chart views in your ``urls.py``::
         path('admin_tools_stats/', include('admin_tools_stats.urls')),
     ]
 
+Ensure, you have ``default`` cache set up: https://docs.djangoproject.com/en/3.2/topics/cache/#memcached
+
 Run migrations::
 
     $ python manage.py migrate
 
-Open admin panel, configure ``Dashboard Stats Criteria`` & ``Dashboard Stats`` respectively
+Open Django admin root and add your ``Dashboard Stats`` configuration:
+
+.. image:: https://github.com/PetrDlouhy/django-admin-charts/raw/master/docs/source/_static/Sn%C3%ADmek%20obrazovky_2022-03-04_17-29-58.png
+.. image:: https://github.com/PetrDlouhy/django-admin-charts/raw/master/docs/source/_static/Sn%C3%ADmek%20obrazovky_2022-03-04_17-31-16.png
+
+Then the charts will appear on the root of Django admin page as well as on analytics page (``/admin_tools_stats/analytics/``).
 
 ======================
 Special configurations
@@ -102,6 +103,19 @@ Follow ``django-admin-charts`` installation according to previous section. Espec
 Change ``DashboardCharts`` to ``DashboardChart`` in dashboard definition (this is recomended even if dummy class is left for compatibility reasons).
 
 Check any overridden template from ``admin_tools_stats`` or ``DashboardChart(s)`` class that might interfere with the changes.
+
+Configure javascript libraries
+----------------------------------------------------------
+
+By default the nvd3/d3 libraries are taken from unpkg.
+If you want to install those libraries on your own, you can set their path by following settings::
+
+   ADMIN_CHARTS_NVD3_JS_PATH = 'bow/nvd3/build/nv.d3.js'
+   ADMIN_CHARTS_NVD3_CSS_PATH = 'bow/nvd3/build/nv.d3.css'
+   ADMIN_CHARTS_D3_JS_PATH = 'bow/d3/d3.js'
+
+The settings can accept either full path (with http...) or there can be static file path.
+Note that versions ``nvd3==1.8.6`` and ``d3==3.3.13`` are the only tested to be working.
 
 
 Installation of javascript libraries with ``django-bower``
@@ -122,7 +136,7 @@ Add the following properties to you settings.py file::
 
     BOWER_INSTALLED_APPS = (
         'd3#3.3.13',
-        'nvd3#1.7.1',
+        'nvd3#1.8.6',
     )
 
 Add django-bower finder to your static file finders::
@@ -157,7 +171,11 @@ Add following code to dashboard.py::
     # Copy following code into your custom dashboard
     # append following code after recent actions module or
     # a link list module for "quick links"
-    graph_list = get_active_graph()
+    if context['request'].user.has_perm('admin_tools_stats.view_dashboardstats'):
+            graph_list = get_active_graph()
+        else:
+            graph_list = []
+
     for i in graph_list:
         kwargs = {}
         kwargs['require_chart_jscss'] = True

@@ -1,11 +1,37 @@
 Changelog
 =========
 
-0.23.1 (2021-02-23)
+1.0.0 (unreleased)
+------------------
+* store chart values in CachedValue table in DB to make charts with more complicated queries faster
+* add refresh/refresh all/reload on change controls to the charts
+* use unpkg versions of nvd3/d3 libraries as default to simplify initial configuration
+
+  * set ``ADMIN_CHARTS_NVD3_JS_PATH``, ``ADMIN_CHARTS_NVD3_CSS_PATH``, ``ADMIN_CHARTS_D3_JS_PATH`` variables if you want to continue using your internal JS files
+
+0.25.2 (2021-12-30)
+-------------------
+* fix problem where in queries with count limit the choices could have been shuffled
+
+0.25.1 (2021-12-30)
+-------------------
+* fix broken admin index page
+
+0.25.0 (2021-12-28)
+-------------------
+* add support for charts in userspace
+  Charts with option `show_for_users` turned on are displayed to users.
+  The charts has to have set some `user_field`, this filters data attributed only for the user.
+* add support for multiple operation fields (separated by comma)
+* improve analytics page - fix loading time, add loading overlay
+* fix usage without jsonfield package installed
+* Admin charts are now displayed only for users with `view_dashboardstats` permissions set on
+
+0.24.1 (2021-02-23)
 -------------------
 * add ADMIN_CHARTS_USE_JSONFIELD setting
 
-0.23.0 (2021-02-23)
+0.24.0 (2021-02-23)
 -------------------
 * fixes for MySQL
 * add quarter time scale option
