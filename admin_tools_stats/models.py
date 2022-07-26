@@ -556,6 +556,7 @@ class DashboardStats(models.Model):
                             criteria_value = m2m.get_dynamic_choices(
                                 time_since,
                                 time_until,
+                                None,
                                 operation_choice,
                                 operation_field_choice,
                                 user,
@@ -639,7 +640,7 @@ class DashboardStats(models.Model):
         operations = self.get_operations_list()
         if m2m and m2m.criteria.dynamic_criteria_field_name:
             choices = m2m.get_dynamic_choices(
-                time_since, time_until, operation_choice, operation_field_choice, user
+                time_since, time_until, None, operation_choice, operation_field_choice, user
             )
             for key, name in choices.items():
                 if key != "":
@@ -886,6 +887,7 @@ class CriteriaToStatsM2M(models.Model):
         slef,
         time_since,
         time_until,
+        def_filter=None,
         count_limit=None,
         operation_choice=None,
         operation_field_choice=None,
@@ -935,6 +937,10 @@ class CriteriaToStatsM2M(models.Model):
                             )
                         end_time = time_until
                         date_filters["%s__lte" % self.stats.date_field_name] = end_time
+                        
+                if def_filter != None:
+                    for key in def_filter:
+                        date_filters[key] = def_filter[key]
                 choices_queryset = model.objects.filter(
                     **date_filters,
                 )
@@ -977,6 +983,7 @@ class CriteriaToStatsM2M(models.Model):
         self,
         time_since=None,
         time_until=None,
+        def_filter=None,
         operation_choice=None,
         operation_field_choice=None,
         user=None,
@@ -990,6 +997,7 @@ class CriteriaToStatsM2M(models.Model):
             self,
             time_since,
             time_until,
+            def_filter,
             self.count_limit,
             operation_choice,
             operation_field_choice,
