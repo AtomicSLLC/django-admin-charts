@@ -102,7 +102,16 @@ class ChartDataView(TemplateView):
                 get_time_series = dashboard_stats.get_multi_time_series_cached
             else:
                 get_time_series = dashboard_stats.get_multi_time_series
+            
+            previous = get_dynamic_choices_array(configuration)
+            def_filter = {}
 
+            for p in previous:
+                if p[1] != '':
+                    id = p[0].replace('select_box_dynamic_', '')
+                    crit = CriteriaToStatsM2M.objects.get(id=id)
+                    def_filter["%s" % crit.get_dynamic_criteria_field_name()] = p[1]
+            
             series = get_time_series(
                 configuration,
                 time_since,
@@ -111,6 +120,7 @@ class ChartDataView(TemplateView):
                 operation,
                 operation_field,
                 self.request.user,
+                def_filter,
             )
         except Exception as e:
             if "debug" in configuration:
@@ -121,14 +131,6 @@ class ChartDataView(TemplateView):
             return context
         criteria = dashboard_stats.get_multi_series_criteria(configuration)
         if criteria:
-            previous = get_dynamic_choices_array(configuration)
-            def_filter = {}
-
-            for p in previous:
-                if p[1] != '':
-                    id = p[0].replace('select_box_dynamic_', '')
-                    crit = CriteriaToStatsM2M.objects.get(id=id)
-                    def_filter["%s" % crit.get_dynamic_criteria_field_name()] = p[1]
             choices = criteria.get_dynamic_choices(time_since, time_until, def_filter=def_filter)
         else:
             choices = {}
