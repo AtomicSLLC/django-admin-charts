@@ -121,7 +121,15 @@ class ChartDataView(TemplateView):
             return context
         criteria = dashboard_stats.get_multi_series_criteria(configuration)
         if criteria:
-            choices = criteria.get_dynamic_choices(time_since, time_until)
+            previous = get_dynamic_choices_array(configuration)
+            def_filter = {}
+
+            for p in previous:
+                if p[1] != '':
+                    id = p[0].replace('select_box_dynamic_', '')
+                    crit = CriteriaToStatsM2M.objects.get(id=id)
+                    def_filter["%s" % crit.get_dynamic_criteria_field_name()] = p[1]
+            choices = criteria.get_dynamic_choices(time_since, time_until, def_filter=def_filter)
         else:
             choices = {}
 
