@@ -521,6 +521,7 @@ class DashboardStats(models.Model):
         operation_choice: Optional[str],
         operation_field_choice: Optional[str],
         interval: Interval,
+        def_filter: Dict[str, str] = None,
     ):
         """Get the stats time series"""
         model_name = apps.get_model(self.model_app_name, self.model_name)
@@ -556,10 +557,11 @@ class DashboardStats(models.Model):
                             criteria_value = m2m.get_dynamic_choices(
                                 time_since,
                                 time_until,
-                                None,
+                                def_filter,
                                 operation_choice,
                                 operation_field_choice,
                                 user,
+                                def_filter,
                             )[dynamic_value]
                         except KeyError:
                             criteria_value = 0
@@ -626,6 +628,7 @@ class DashboardStats(models.Model):
         operation_choice: Optional[str],
         operation_field_choice: Optional[str],
         user: Union[User, AnonymousUser],
+        def_filter: Dict[str, str] = None,
     ):
         if time_since > time_until:
             raise Exception("time_since is greater than time_until")
@@ -640,7 +643,7 @@ class DashboardStats(models.Model):
         operations = self.get_operations_list()
         if m2m and m2m.criteria.dynamic_criteria_field_name:
             choices = m2m.get_dynamic_choices(
-                time_since, time_until, None, operation_choice, operation_field_choice, user
+                time_since, time_until, def_filter, operation_choice, operation_field_choice, user
             )
             for key, name in choices.items():
                 if key != "":
@@ -664,6 +667,7 @@ class DashboardStats(models.Model):
             operation_choice,
             operation_field_choice,
             interval,
+            def_filter,
         )
         for tv in serie_map:
             time = tv[0]
@@ -738,6 +742,7 @@ class DashboardStats(models.Model):
         operation_choice: Optional[str],
         operation_field_choice: Optional[str],
         user: Union[User, AnonymousUser],
+        def_filter: Dict[str, str] = None,
     ):
         m2m = self.get_multi_series_criteria(configuration)
         reload_data = configuration.pop("reload", None) in ("true", "True")
@@ -769,6 +774,7 @@ class DashboardStats(models.Model):
                     operation_choice,
                     operation_field_choice,
                     user,
+                    def_filter,
                 )
                 i = 0
                 for date, values_dict in values.items():
