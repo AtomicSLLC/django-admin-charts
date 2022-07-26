@@ -8,7 +8,7 @@ from datetime_truncate import truncate
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 
-from .models import DashboardStats, Interval, get_charts_timezone, truncate_ceiling
+from .models import DashboardStats, Interval, get_charts_timezone, truncate_ceiling, get_dynamic_choices_array, CriteriaToStatsM2M
 
 
 logger = logging.getLogger(__name__)
