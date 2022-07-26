@@ -561,7 +561,6 @@ class DashboardStats(models.Model):
                                 operation_choice,
                                 operation_field_choice,
                                 user,
-                                def_filter,
                             )[dynamic_value]
                         except KeyError:
                             criteria_value = 0
