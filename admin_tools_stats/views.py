@@ -186,7 +186,7 @@ class ChartDataView(TemplateView):
         }
 
         context["chart_container"] = "chart_container_" + graph_key
-        context["total"] = total
+        context["total"] = "%.0f" % total
         return context
 
 
