@@ -12,7 +12,9 @@ function loadChartScript(){
 };
 loadChartScript();
 
+
 var cont = d3.select('#{{chart_container}} svg');
+cont.selectAll("text").remove();
 cont.append("text")
      .attr("x", document.body.offsetWidth/2)
      .attr("y", 20)
