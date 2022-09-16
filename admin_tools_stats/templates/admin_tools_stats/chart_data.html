@@ -11,6 +11,15 @@ function loadChartScript(){
    {% load_chart chart_type values chart_container extra %}
 };
 loadChartScript();
+
+var cont = d3.select('#{{chart_container}} svg');
+cont.append("text")
+     .attr("x", document.body.offsetWidth/2)
+     .attr("y", 20)
+     .attr("text-anchor", "middle")
+     .style("font-size", "16px")
+     .style("text-decoration", "underline")
+     .text("Total {{total}}");
 {% endif %}
 {% if request.GET.debug %}
 </pre></body></html>

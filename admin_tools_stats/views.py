@@ -138,6 +138,7 @@ class ChartDataView(TemplateView):
         ydata_serie: Dict[str, List[int]] = {}
         names = {}
         xdata = []
+        total = 0
         serie_i_map: Dict[str, int] = OrderedDict()
         for date in sorted(
             series.keys(),
@@ -145,6 +146,7 @@ class ChartDataView(TemplateView):
         ):
             xdata.append(int(time.mktime(date.timetuple()) * 1000))
             for key, value in series[date].items():
+                total += value if value else 0
                 if key not in serie_i_map:
                     serie_i_map[key] = len(serie_i_map)
                 y_key = "y%i" % serie_i_map[key]
@@ -184,6 +186,7 @@ class ChartDataView(TemplateView):
         }
 
         context["chart_container"] = "chart_container_" + graph_key
+        context["total"] = total
         return context
 
 
