@@ -185,9 +185,8 @@ class ChartDataView(TemplateView):
             "extra1": extra_serie,
         }
         
-        if len(series) > 11:
-            context['extra']['show_controls'] = False
-            context['extra']['show_legend'] = False
+        context['extra']['show_controls'] = False
+        context['extra']['show_legend'] = False
 
         context["chart_container"] = "chart_container_" + graph_key
         context["total"] = "%.0f" % total
